@@ -1,0 +1,3 @@
+MongoDb CodeLogin
+
+mongodb+srv://root:myPassword123@cluster0.hunn6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0

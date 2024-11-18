@@ -23,6 +23,11 @@ export default function MyApp() {
       });
   }, []);
 
+  function putInCart(pname) {
+    console.log('Putting in cart: ' + pname)
+    fetch('http://localhost:3000/api/putInCart?pname=' + pname);
+  }
+
   function runShowLogin() {
     setShowFirstPage(false);
     setShowLogin(true);
@@ -80,8 +85,9 @@ export default function MyApp() {
                 <br />
                 {item.pname} - {item.price}
                 <br />
-                <Button variant="outlined"> Add to cart </Button>
-              </div>
+                <Button onClick={() => putInCart(item.pname)} variant="outlined">
+                  Add to cart
+                </Button>              </div>
             ))
           ) : (
             <Typography>Loading products...</Typography>
