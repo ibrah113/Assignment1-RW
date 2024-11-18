@@ -1,46 +1,31 @@
-export async function GET(req, res) {
+import { NextResponse } from 'next/server';
+import { MongoClient } from 'mongodb';
 
-    console.log("Register new user:");
-
-
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get('email');
-    const pass = searchParams.get('pass');
-    
-
-    console.log(email);
-    console.log(pass);
-
-    // =================================================
-const { MongoClient } = require('mongodb');
 const url = 'mongodb+srv://root:myPassword123@cluster0.hunn6.mongodb.net/?retryWrites=true&w=majority';
 const client = new MongoClient(url);
-const dbName = 'app'; 
+const dbName = 'app';
 
-await client.connect();
+export async function POST(request) {
+  try {
+    const { email, pass } = await request.json();
 
-console.log('Connected successfully to server');
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('login'); 
 
-const db = client.db(dbName);
+    // Find user with matching email and password
+    const user = await collection.findOne({ username: email, pass });
 
-const collection = db.collection('login'); 
-
-const findResult = await collection.find({"username": 
-    "sample@test.com"}).toArray();
-
-console.log('Found documents =>', findResult);
-let valid = false
-if(findResult.length >0 ){
-valid = true;
-console.log("login valid")
-} else {
-valid = false;
-console.log("login invalid")
-}
-//=========================================================
-
-
-
-    
-return Response.json({ "data":"valid" })
+    if (user) {
+      // Return account type for redirection
+      return NextResponse.json({ valid: true, role: user.acc_type });
+    } else {
+      return NextResponse.json({ valid: false });
+    }
+  } catch (error) {
+    console.error('Error during login API:', error);
+    return NextResponse.json({ valid: false, error: 'Internal Server Error' });
+  } finally {
+    await client.close();
+  }
 }

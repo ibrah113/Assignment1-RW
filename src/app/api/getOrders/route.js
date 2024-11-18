@@ -9,14 +9,15 @@ export async function GET() {
   try {
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection('products'); 
+    const collection = db.collection('orders'); // Ensure this collection exists
 
-    const products = await collection.find({}).toArray();
+    // Fetch all orders
+    const orders = await collection.find({}).toArray();
 
-    return NextResponse.json(products);
+    return NextResponse.json(orders);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    return NextResponse.json({ error: 'Failed to fetch products' });
+    console.error('Error fetching orders:', error);
+    return NextResponse.json({ error: 'Failed to fetch orders' });
   } finally {
     await client.close();
   }
