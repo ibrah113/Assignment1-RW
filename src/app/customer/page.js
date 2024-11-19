@@ -9,20 +9,31 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
+import { useRouter } from 'next/navigation';
 
 export default function Customer() {
   const [products, setProducts] = useState([]);
   const [weather, setWeather] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
+    // Check if the user is logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (!isLoggedIn) {
+      alert('Please log in to access this page.');
+      router.push('/login');
+    }
+
+    // Fetch products
     fetch('/api/getProducts')
       .then((res) => res.json())
       .then((data) => setProducts(data));
 
+    // Fetch weather
     fetch('/api/getWeather')
       .then((res) => res.json())
       .then((data) => setWeather(data.temp));
-  }, []);
+  }, [router]);
 
   const addToCart = async (productName) => {
     try {
@@ -39,8 +50,15 @@ export default function Customer() {
     }
   };
 
-  if (!products.length) return <Typography>Loading products...</Typography>;
-  if (!weather) return <Typography>Loading weather...</Typography>;
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('isLoggedIn');
+    router.push('/login');
+  };
+
+  if (!products.length || weather === null) {
+    return <Typography>Loading...</Typography>;
+  }
 
   return (
     <>
@@ -49,15 +67,23 @@ export default function Customer() {
         <Box sx={{ textAlign: 'center', marginTop: 2 }}>
           <Typography variant="h4">Customer Page</Typography>
           <Typography variant="h6">Current Temperature: {weather}°C</Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ marginTop: 2 }}
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
         </Box>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center', marginTop: 3 }}>
           {products.map((product, index) => (
-            <Card key={index} sx={{ maxWidth: 345 }}>
+            <Card key={index} sx={{ maxWidth: 345, boxShadow: 3 }}>
               <CardMedia
                 component="img"
                 alt={product.pname}
-                height="140"
-                image={product.image || 'https://via.placeholder.com/150'}
+                height="200"
+                image={product.image || 'https://via.placeholder.com/200'}
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">

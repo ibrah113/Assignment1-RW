@@ -16,24 +16,36 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    if (data.success) {
-      setMessage('Login successful!');
-      if (data.role === 'manager') {
-        window.location.href = '/manager';
-      } else if (data.role === 'customer') {
-        window.location.href = '/customer';
+      const data = await res.json();
+
+      if (data.success) {
+        setMessage('Login successful!');
+
+        // Save user role and login state
+        localStorage.setItem('userRole', data.role);
+        localStorage.setItem('isLoggedIn', true);
+
+        // Redirect based on role
+        if (data.role === 'manager') {
+          window.location.href = '/manager';
+        } else if (data.role === 'customer') {
+          window.location.href = '/customer';
+        }
+      } else {
+        setMessage(data.message || 'Invalid email or password. Please try again.');
       }
-    } else {
-      setMessage('Invalid email or password. Please try again.');
+    } catch (error) {
+      console.error('Error during login:', error);
+      setMessage('An unexpected error occurred. Please try again.');
     }
   };
 

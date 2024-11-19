@@ -16,12 +16,12 @@ export default function Register() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     if (password !== confirmPassword) {
       setMessage('Passwords do not match');
       return;
     }
-  
+
     try {
       const res = await fetch('/api/newregister', {
         method: 'POST',
@@ -30,17 +30,11 @@ export default function Register() {
         },
         body: JSON.stringify({ email, password }),
       });
-  
-      if (!res.ok) {
-        const errorData = await res.text(); // Log non-JSON responses
-        console.error('Error response:', errorData);
-        setMessage('Registration failed. Please try again.');
-        return;
-      }
-  
+
       const data = await res.json();
+
       if (data.success) {
-        setMessage('Registration successful!');
+        setMessage('Registration successful! Please log in.');
       } else {
         setMessage(data.error || 'Registration failed. Please try again.');
       }
