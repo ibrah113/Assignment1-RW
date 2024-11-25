@@ -30,7 +30,7 @@ export default function Register() {
         console.log("Telephone Number:", number);
       
         // Pass data as an object to the function
-        runDBCallAsync(`http://localhost:3000/api/newregister?email=${email}&pass=${pass}`);
+        runDBCallAsync(`/api/newregister?email=${email}&pass=${pass}`);
       };
       
       async function runDBCallAsync(url) {
