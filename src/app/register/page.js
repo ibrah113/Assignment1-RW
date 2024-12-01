@@ -15,14 +15,18 @@ export default function Register() {
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent form default behavior
 
+    // Validate passwords
     if (password !== confirmPassword) {
       setMessage('Passwords do not match');
       return;
     }
 
     try {
+      console.log('Submitting registration with:', { email, password });
+
+      // Make API call to register the user
       const res = await fetch('/api/newregister', {
         method: 'POST',
         headers: {
@@ -31,8 +35,18 @@ export default function Register() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      console.log('API Response status:', res.status);
 
+      // Check if the response is successful
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+
+      // Parse the response JSON
+      const data = await res.json();
+      console.log('API Response data:', data);
+
+      // Handle success or error in the API response
       if (data.success) {
         setMessage('Registration successful! Please log in.');
       } else {
@@ -81,7 +95,7 @@ export default function Register() {
             </Button>
           </Box>
           {message && (
-            <Typography variant="body2" color="error" sx={{ marginTop: 2 }}>
+            <Typography variant="body2" color={message.includes('successful') ? 'primary' : 'error'} sx={{ marginTop: 2 }}>
               {message}
             </Typography>
           )}

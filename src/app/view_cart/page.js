@@ -5,8 +5,8 @@ import Header from '../components/Header';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
 
 export default function ViewCart() {
   const [cartItems, setCartItems] = useState([]);
@@ -17,7 +17,6 @@ export default function ViewCart() {
       const res = await fetch('/api/getCartItems');
       const data = await res.json();
 
-      // Calculate the total price safely
       const total = data.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
       setCartItems(data);

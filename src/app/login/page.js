@@ -7,11 +7,13 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -25,20 +27,21 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       });
 
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (data.success) {
-        setMessage('Login successful!');
-
-        // Save user role and login state
         localStorage.setItem('userRole', data.role);
         localStorage.setItem('isLoggedIn', true);
 
-        // Redirect based on role
+        setMessage('Login successful!');
         if (data.role === 'manager') {
-          window.location.href = '/manager';
-        } else if (data.role === 'customer') {
-          window.location.href = '/customer';
+          router.push('/manager');
+        } else {
+          router.push('/customer');
         }
       } else {
         setMessage(data.message || 'Invalid email or password. Please try again.');

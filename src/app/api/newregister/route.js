@@ -9,18 +9,15 @@ export async function POST(req) {
   try {
     const { email, password } = await req.json();
 
-    // Connect to the database
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('login');
 
-    // Check if the email already exists
     const existingUser = await collection.findOne({ username: email });
     if (existingUser) {
       return NextResponse.json({ success: false, error: 'Email already registered' });
     }
 
-    // Insert new user
     await collection.insertOne({ username: email, pass: password, acc_type: 'customer' });
 
     return NextResponse.json({ success: true });

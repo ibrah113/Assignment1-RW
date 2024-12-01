@@ -9,24 +9,21 @@ export async function POST(req) {
   try {
     const { email, password } = await req.json();
 
-    console.log('Login attempt:', { email, password }); // Debugging log
+    console.log('Login attempt:', { email, password }); 
 
     // Connect to the database
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('login');
 
-    // Find the user in the database
     const user = await collection.findOne({ username: email, pass: password });
 
     if (!user) {
-      console.log('User not found or password mismatch'); // Debugging log
+      console.log('User not found or password mismatch'); 
       return NextResponse.json({ success: false, message: 'Invalid email or password' });
     }
 
-    console.log('Login successful:', { email, role: user.acc_type }); // Debugging log
-
-    // Return user role
+    console.log('Login successful:', { email, role: user.acc_type }); 
     return NextResponse.json({ success: true, role: user.acc_type });
   } catch (error) {
     console.error('Error during login:', error);

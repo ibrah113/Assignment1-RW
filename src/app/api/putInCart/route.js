@@ -13,17 +13,15 @@ export async function GET(req) {
     await client.connect();
     const db = client.db(dbName);
 
-    // Get the product details, including the price
     const product = await db.collection('products').findOne({ pname });
     if (!product) {
       return NextResponse.json({ success: false, error: 'Product not found' });
     }
 
-    // Add the item to the shopping cart
     const cartItem = {
       pname: product.pname,
-      price: product.price, // Add the correct price
-      username: 'user@example.com', // Replace with actual session user email
+      price: product.price, 
+      username: 'user@example.com', 
     };
 
     await db.collection('shopping_cart').insertOne(cartItem);

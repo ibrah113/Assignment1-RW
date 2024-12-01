@@ -11,13 +11,11 @@ export async function GET() {
     const db = client.db(dbName);
     const collection = db.collection('shopping_cart');
 
-    // Fetch all items in the cart
     const cartItems = await collection.find({}).toArray();
 
-    // Ensure every item has a valid price
     const validCartItems = cartItems.map((item) => ({
       ...item,
-      price: item.price || 0, // Default to 0 if price is missing
+      price: item.price || 0, 
     }));
 
     return NextResponse.json(validCartItems);

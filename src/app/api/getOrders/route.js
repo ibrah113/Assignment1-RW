@@ -9,9 +9,8 @@ export async function GET() {
   try {
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection('orders'); // Ensure this collection exists
+    const collection = db.collection('orders'); 
 
-    // Fetch all orders
     const orders = await collection.find({}).toArray();
 
     return NextResponse.json(orders);
