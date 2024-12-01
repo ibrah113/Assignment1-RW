@@ -13,7 +13,6 @@ export async function POST(request) {
     const db = client.db(dbName);
     const ordersCollection = db.collection('orders');
 
-    // Insert order into the database
     const order = {
       items: cartItems,
       total: totalPrice,
@@ -23,7 +22,6 @@ export async function POST(request) {
 
     await ordersCollection.insertOne(order);
 
-    // Simulate sending an email
     console.log('Order confirmation email sent to:', order.customerEmail);
 
     return NextResponse.json({ success: true });

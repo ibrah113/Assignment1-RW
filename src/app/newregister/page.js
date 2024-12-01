@@ -29,7 +29,6 @@ export default function Register() {
         console.log("Address:", address);
         console.log("Telephone Number:", number);
       
-        // Pass data as an object to the function
         runDBCallAsync(`/api/newregister?email=${email}&pass=${pass}`);
       };
       
