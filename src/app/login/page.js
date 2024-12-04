@@ -7,16 +7,48 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { useRouter } from 'next/navigation';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import validator from 'email-validator';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => setOpen(false);
+
+  const validateForm = () => {
+    let errorMessage = '';
+
+    // Validate email
+    if (!validator.validate(email)) {
+      errorMessage += 'Invalid email address.\n';
+    }
+
+    // Validate password
+    if (!password || password.length < 6) {
+      errorMessage += 'Password must be at least 6 characters long.';
+    }
+
+    return errorMessage;
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // Validate form
+    const errorMessage = validateForm();
+
+    if (errorMessage.length > 0) {
+      setMessage(errorMessage);
+      setOpen(true);
+      return;
+    }
 
     try {
       const res = await fetch('/api/login', {
@@ -27,28 +59,26 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
-      }
-
       const data = await res.json();
 
       if (data.success) {
+        setMessage('Login successful!');
         localStorage.setItem('userRole', data.role);
         localStorage.setItem('isLoggedIn', true);
 
-        setMessage('Login successful!');
         if (data.role === 'manager') {
-          router.push('/manager');
-        } else {
-          router.push('/customer');
+          window.location.href = '/manager';
+        } else if (data.role === 'customer') {
+          window.location.href = '/customer';
         }
       } else {
         setMessage(data.message || 'Invalid email or password. Please try again.');
+        setOpen(true);
       }
     } catch (error) {
       console.error('Error during login:', error);
       setMessage('An unexpected error occurred. Please try again.');
+      setOpen(true);
     }
   };
 
@@ -80,11 +110,17 @@ export default function Login() {
               Login
             </Button>
           </Box>
-          {message && (
-            <Typography variant="body2" color="error" sx={{ marginTop: 2 }}>
-              {message}
-            </Typography>
-          )}
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Error</DialogTitle>
+            <DialogContent>
+              <DialogContentText>{message}</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} autoFocus>
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Container>
     </>
